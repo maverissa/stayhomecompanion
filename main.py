@@ -77,6 +77,10 @@ def query_handler(call):
         markup = types.InlineKeyboardMarkup()
         markup.add(telebot.types.InlineKeyboardButton
                    (text=(emoji.emojize
+                          ('Hit parades :chart_with_upwards_trend:',
+                           use_aliases=True)), callback_data='hitparades'))
+        markup.add(telebot.types.InlineKeyboardButton
+                   (text=(emoji.emojize
                           ('Favourite genre :notes:', use_aliases=True)),
                     callback_data='genre'))
         markup.add(telebot.types.InlineKeyboardButton
