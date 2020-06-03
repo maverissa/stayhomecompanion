@@ -4,6 +4,7 @@ import requests
 import random
 import emoji
 import json
+import film
 import lyricsgenius
 bot = telebot.TeleBot('1116307628:AAGco0iC37MG0Yy_J3p7esHABjEpedxu7u0')
 
@@ -74,10 +75,6 @@ def query_handler(call):
     elif call.data == 'mus':
         # работа с API музыки
         markup = types.InlineKeyboardMarkup()
-        markup.add(telebot.types.InlineKeyboardButton
-                   (text=(emoji.emojize
-                          ('Hit parades :chart_with_upwards_trend:',
-                           use_aliases=True)), callback_data='hitparades'))
         markup.add(telebot.types.InlineKeyboardButton
                    (text=(emoji.emojize
                           ('Favourite genre :notes:', use_aliases=True)),
@@ -268,7 +265,34 @@ def query_handler(call):
         searching_a_song("https://api.deezer.com/playlist/2097558104", 78, 1)
     elif call.data == 'filmsseries':
         # работа с API кино
-        pass
+        markup = types.InlineKeyboardMarkup()
+        markup.add(telebot.types.InlineKeyboardButton(text='Top 5 films',
+                                                      callback_data='top'))
+        markup.add(telebot.types.InlineKeyboardButton(text='Actor',
+                                                      callback_data='actor'))
+        markup.add(telebot.types.InlineKeyboardButton(text='Rating',
+                                                      callback_data='rating'))
+        markup.add(telebot.types.InlineKeyboardButton(text='Released year',
+                                                      callback_data='year'))
+        bot.send_message(call.message.chat.id,
+                         'By what criteria do you want to choose a film?',
+                         reply_markup=markup)
+    if call.data == 'top':
+        bot.send_message(call.message.chat.id, 'Here are 5 movies from top '
+                                               '250. Enjoy!')
+        bot.send_message(call.message.chat.id, film.top5())
+    elif call.data == 'actor':
+        bot.send_message(call.message.chat.id, 'Write the name of the actor:')
+
+        @bot.message_handler(content_types=['text'])
+        def send_text(message):
+            bot.send_message(call.message.chat.id,
+                             film.film_by_actor(message.text))
+    elif call.data == 'rating':
+        bot.send_message(call.message.chat.id, 'Film with rating more than 7:')
+        bot.send_message(call.message.chat.id, film.rating())
+    elif call.data == 'year':
+        bot.send_message(call.message.chat.id, 'Write the film director:')
 
 
 bot.polling()
