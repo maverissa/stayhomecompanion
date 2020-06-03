@@ -1,5 +1,4 @@
 import telebot
-from telebot import types
 import json
 import requests
 import random
@@ -41,16 +40,6 @@ def searching_a_song(call, url, n, times):
             bot.send_message(call.message.chat.id,
                              "Sorry, I didn't find the preview of that "
                              "song")
-
-
-def buttons(call, which_buttons, which_msg):
-    i = -1
-    markup = types.InlineKeyboardMarkup()
-    while i < len(which_buttons) - 1:
-        i += 1
-        markup.add(telebot.types.InlineKeyboardButton
-                   (text=which_buttons[i], callback_data=which_buttons[i]))
-    bot.send_message(call.message.chat.id, which_msg, reply_markup=markup)
 
 
 def hitparades_song(call):

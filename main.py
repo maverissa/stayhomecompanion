@@ -1,13 +1,21 @@
 import telebot
 from telebot import types
-import requests
-import random
 import emoji
-import json
 import film
 import lyricsgenius
 import music
+
 bot = telebot.TeleBot('1116307628:AAGco0iC37MG0Yy_J3p7esHABjEpedxu7u0')
+
+
+def buttons(call, which_buttons, which_msg):
+    i = -1
+    markup = types.InlineKeyboardMarkup()
+    while i < len(which_buttons) - 1:
+        i += 1
+        markup.add(telebot.types.InlineKeyboardButton
+                   (text=which_buttons[i], callback_data=which_buttons[i]))
+    bot.send_message(call.message.chat.id, which_msg, reply_markup=markup)
 
 
 @bot.message_handler(commands=["start"])
@@ -24,8 +32,8 @@ def general_menu(message):
          callback_data='mus'))
     markup.add(
         telebot.types.InlineKeyboardButton
-        (text=(emoji.emojize('Films and series :movie_camera:',
-                             use_aliases=True)), callback_data='filmsseries'))
+        (text=(emoji.emojize('Films:movie_camera:',
+                             use_aliases=True)), callback_data='films'))
     bot.send_message(message.chat.id, 'What do you want me to recommend you?',
                      reply_markup=markup)
 
@@ -54,56 +62,67 @@ def song_lyrics(message):
 @bot.callback_query_handler(func=lambda call: True)
 def query_handler(call):
     if call.data == 'games':
-        # работа с API игр
+        # work with games API
         pass
     elif call.data == 'mus':
-        # работа с API музыки
-        music.buttons(call, music.mus_menu, music.mus_menu_msg)
+        # work with music API
+        buttons(call, music.mus_menu, music.mus_menu_msg)
     if call.data == music.mus_menu[0]:
-        music.buttons(call, music.ht_button, music.ht_msg)
+        buttons(call, music.ht_button, music.ht_msg)
     elif call.data in music.ht_button:
         music.hitparades_song(call)
-        music.buttons(call, music.ht_button, music.ht_msg)
+        buttons(call, music.ht_button, music.ht_msg)
     elif call.data == music.mus_menu[1]:
-        music.buttons(call, music.genre_button, music.genre_msg)
+        buttons(call, music.genre_button, music.genre_msg)
     elif call.data in music.genre_button:
         music.genre_song(call)
-        music.buttons(call, music.genre_button, music.genre_msg)
+        buttons(call, music.genre_button, music.genre_msg)
     elif call.data == music.mus_menu[2]:
-        music.buttons(call, music.mood_button, music.mood_msg)
+        buttons(call, music.mood_button, music.mood_msg)
     elif call.data in music.mood_button:
         music.mood_song(call)
-        music.buttons(call, music.mood_button, music.mood_msg)
-    elif call.data == 'filmsseries':
-        # работа с API кино
-        markup = types.InlineKeyboardMarkup()
-        markup.add(telebot.types.InlineKeyboardButton(text='Top 5 films',
-                                                      callback_data='top'))
-        markup.add(telebot.types.InlineKeyboardButton(text='Actor',
-                                                      callback_data='actor'))
-        markup.add(telebot.types.InlineKeyboardButton(text='Rating',
-                                                      callback_data='rating'))
-        markup.add(telebot.types.InlineKeyboardButton(text='Released year',
-                                                      callback_data='year'))
-        bot.send_message(call.message.chat.id,
-                         'By what criteria do you want to choose a film?',
-                         reply_markup=markup)
-    if call.data == 'top':
+        buttons(call, music.mood_button, music.mood_msg)
+    elif call.data == 'films':
+        # work with the movie API
+        buttons(call, film.film_menu, film.film_menu_msg)
+    if call.data == film.film_menu[0]:  # top5
         bot.send_message(call.message.chat.id, 'Here are 5 movies from top '
                                                '250. Enjoy!')
         bot.send_message(call.message.chat.id, film.top5())
-    elif call.data == 'actor':
-        bot.send_message(call.message.chat.id, 'Write the name of the actor:')
+    elif call.data == film.film_menu[1]:  # actor
+        bot.send_message(call.message.chat.id,
+                         emoji.emojize('Write the name of the actor. '
+                                       'For the correct selection, please, '
+                                       'try to write as correctly and fully'
+                                       ' as possible.:revolving_hearts: '
+                                       '\nExample: Leonardo DiCaprio'))
 
         @bot.message_handler(content_types=['text'])
         def send_text(message):
             bot.send_message(call.message.chat.id,
                              film.film_by_actor(message.text))
-    elif call.data == 'rating':
-        bot.send_message(call.message.chat.id, 'Film with rating more than 7:')
-        bot.send_message(call.message.chat.id, film.rating())
-    elif call.data == 'year':
-        bot.send_message(call.message.chat.id, 'Write the film director:')
+    elif call.data == film.film_menu[2]:  # rating
+        buttons(call, film.rating_button, film.rating_msg)
+    elif call.data in film.rating_button:
+        if call.data == film.rating_button[0]:
+            film.rating(call)
+        elif call.data == film.rating_button[1]:
+            film.rating(call)
+    elif call.data == film.film_menu[3]:  # year
+        bot.send_message(call.message.chat.id, 'Write the year:')
 
 
 bot.polling()
+
+"""
+Не получилось
+msg = bot.send_message(call.message.chat.id,
+                               emoji.emojize(
+                                   'Write the name of the actor. '
+                                   'For the correct selection, please, '
+                                   'try to write as correctly and fully'
+                                   ' as possible.:revolving_hearts: '
+                                   '\nExample: Leonardo DiCaprio'))
+        bot.register_next_step_handler(msg,
+                                       film.film_by_actor(message.text, call.message))
+"""

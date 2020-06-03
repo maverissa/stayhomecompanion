@@ -1,8 +1,20 @@
 import imdb
 import random
-# Выбор рандомных 5 кино из топа
+import emoji
+import telebot
 
 
+bot = telebot.TeleBot('1116307628:AAGco0iC37MG0Yy_J3p7esHABjEpedxu7u0')
+rating_button = ['7-8', '9-10']
+rating_msg = 'Choose the rating:'
+film_menu = [emoji.emojize('5 movies from top :bomb:', use_aliases=True),
+             emoji.emojize('Actor :dancer:', use_aliases=True),
+             emoji.emojize('Rating :fire:', use_aliases=True),
+             emoji.emojize('Released year :calendar:', use_aliases=True)]
+film_menu_msg = 'By what criteria do you want to choose a film?'
+
+
+# Selection of random 5 movies from the top
 def top5():
     moviesDB = imdb.IMDb()
     top250 = moviesDB.get_top250_movies()
@@ -17,13 +29,12 @@ def top5():
     return message
 
 
-# Выбор рандомного фильма по актеру
-
-
+# Selection of a random movie by actor
 def film_by_actor(name_of_actor):
     try:
         moviesDB = imdb.IMDb()
-        people = moviesDB.search_person(name_of_actor)  # в скобках вставить вводимое значение боту
+        people = moviesDB.search_person(
+            name_of_actor)  # в скобках вставить вводимое значение боту
         id = people[0].personID
         person = moviesDB.get_person(id)
         bio = moviesDB.get_person_biography(id)
@@ -37,17 +48,21 @@ def film_by_actor(name_of_actor):
         return 'I cannot find this actor. Sorry((('
 
 
-# Рейтинг выше 7
-
-
-def rating():
+# Rating 7-8 and 9-10
+def rating(call):
     moviesDB = imdb.IMDb()
     movies = moviesDB.get_top250_movies()
-    rating_7_higher = []
-    for movie in movies:
-        if int(movie['rating']) > 7:
-            rating_7_higher.append(movie)
-    film = random.choice(rating_7_higher)
-    film_name = random.choice(rating_7_higher)['title']
+    desired_rating = []
+    if call.data == rating_button[1]:
+        for movie in movies:
+            if 7 <= int(movie['rating']) <= 8:
+                desired_rating.append(movie)
+    elif call.data == rating_button[2]:
+        for movie in movies:
+            if 9 <= int(movie['rating']) <= 10:
+                desired_rating.append(movie)
+    film = random.choice(desired_rating)
+    film_name = random.choice(desired_rating)['title']
     year = film['year']
-    return f'film: {film_name}\nreleased year: {year}'
+    bot.send_message(call.message.chat.id,
+                     f'film: {film_name}\nreleased year: {year}')
