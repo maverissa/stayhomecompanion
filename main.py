@@ -32,7 +32,7 @@ def general_menu(message):
          callback_data='mus'))
     markup.add(
         telebot.types.InlineKeyboardButton
-        (text=(emoji.emojize('Films:movie_camera:',
+        (text=(emoji.emojize('Сinematograph:movie_camera:',
                              use_aliases=True)), callback_data='films'))
     bot.send_message(message.chat.id, 'What do you want me to recommend you?',
                      reply_markup=markup)
@@ -89,6 +89,7 @@ def query_handler(call):
         bot.send_message(call.message.chat.id, 'Here are 5 movies from top '
                                                '250. Enjoy!')
         bot.send_message(call.message.chat.id, film.top5())
+        buttons(call, film.film_menu, film.film_menu_msg)
     elif call.data == film.film_menu[1]:  # actor
         bot.send_message(call.message.chat.id,
                          emoji.emojize('Write the name of the actor. '
@@ -104,12 +105,13 @@ def query_handler(call):
     elif call.data == film.film_menu[2]:  # rating
         buttons(call, film.rating_button, film.rating_msg)
     elif call.data in film.rating_button:
-        if call.data == film.rating_button[0]:
-            film.rating(call)
-        elif call.data == film.rating_button[1]:
-            film.rating(call)
+        film.rating(call)
+        buttons(call, film.rating_button, film.rating_msg)
     elif call.data == film.film_menu[3]:  # year
-        bot.send_message(call.message.chat.id, 'Write the year:')
+        buttons(call, film.year_button, film.year_msg)
+    elif call.data in film.year_button:
+        film.by_year(call)
+        buttons(call, film.year_button, film.year_msg)
 
 
 bot.polling()
