@@ -5,6 +5,8 @@ import film
 import lyricsgenius
 import music
 import os
+import game
+
 bot = telebot.TeleBot('1116307628:AAGco0iC37MG0Yy_J3p7esHABjEpedxu7u0')
 subscribers = []
 
@@ -129,6 +131,39 @@ def song_lyrics(message):
 @bot.callback_query_handler(func=lambda call: True)
 def query_handler(call):
     if call.data == 'games':
+        markup = types.InlineKeyboardMarkup()
+        markup.add(telebot.types.InlineKeyboardButton(text='Games with rating >3.0',
+                                                      callback_data='rating'))
+        markup.add(telebot.types.InlineKeyboardButton(text='Random game',
+                                                      callback_data='randg'))
+        markup.add(telebot.types.InlineKeyboardButton(text='Action game',
+                                                      callback_data='Action'))
+        markup.add(telebot.types.InlineKeyboardButton(text='RPG game',
+                                                      callback_data='RPG'))
+        markup.add(telebot.types.InlineKeyboardButton(text='Arcade game',
+                                                      callback_data='Arcade'))
+        bot.send_message(call.message.chat.id, "Choose one:", reply_markup=markup)
+
+    if call.data == 'randg':
+        bot.send_message(call.message.chat.id, 'Here is a random game! ')
+        bot.send_message(call.message.chat.id, game.random_game())
+
+    elif call.data == 'rating':
+        bot.send_message(call.message.chat.id, 'Here is a random game with high rating! ')
+        bot.send_message(call.message.chat.id, game.random_game_rating())
+
+    elif call.data == 'Action':
+        bot.send_message(call.message.chat.id, 'Here is a random action game! ')
+        bot.send_message(call.message.chat.id, game.random_game_action())
+
+    elif call.data == 'RPG':
+        bot.send_message(call.message.chat.id, 'Here is a random rpg game! ')
+        bot.send_message(call.message.chat.id, game.random_game_rpg())
+
+    elif call.data == 'Arcade':
+        bot.send_message(call.message.chat.id, 'Here is a random arcade game! ')
+        bot.send_message(call.message.chat.id, game.random_game_arcade())
+
         # work with games API
         pass
     elif call.data == 'mus':
