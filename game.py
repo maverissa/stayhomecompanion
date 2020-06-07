@@ -3,18 +3,20 @@ import json
 import random
 import re
 import html
+buttons, msg = ['Games with rating >3.0', 'Random game', 'Action game',
+                'RPG game', 'Arcade game'], "Choose one:"
 
 
 # This is def for using html symbols
 def html_decode(s):
-    htmlCodes = (
+    htmlcodes = (
         ("'", '&#39;'),
         ('"', '&quot;'),
         ('>', '&gt;'),
         ('<', '&lt;'),
         ('&', '&amp;')
     )
-    for code in htmlCodes:
+    for code in htmlcodes:
         s = s.replace(code[1], code[0])
     return s
 
@@ -23,7 +25,9 @@ def html_decode(s):
 def random_game():
     while True:
         # Here we take all information from the api site of a random game.
-        response = json.loads(requests.get(f'https://api.rawg.io/api/games/{str(random.randint(1, 10000))}').text)
+        response = json.loads(requests.get
+                              (f'https://api.rawg.io/api/games/'
+                               f'{str(random.randint(1, 10000))}').text)
         if "slug" in response:
             b = 'Genre is not defined.'
             try:
@@ -36,7 +40,8 @@ def random_game():
             dxd = dxd + '\nGenre| ' + b
             dxd = dxd + '\nReleased| ' + str(response['released'])
             dxd = dxd + '\nRating| ' + str(response['rating'])
-            dxd = dxd + '\nAchievements| ' + str(response["achievements_count"])
+            dxd = dxd + '\nAchievements| ' + str(response
+                                                 ["achievements_count"])
             dxd = dxd + '\nWebsite| ' + response['website']
             dxd = dxd + '\nMetacritics| ' + str(response['metacritic'])
             c = html.unescape(response['description'])
@@ -50,8 +55,11 @@ def random_game():
 def random_game_rating():
     while True:
         # Here we take all information from the api site of a random game.
-        response = json.loads(requests.get(f'https://api.rawg.io/api/games/{str(random.randint(1, 10000))}').text)
-        if "slug" in response and "rating" in response and response['rating'] > 3.0:
+        response = json.loads(requests.get(f'https://api.rawg.io/api/games/'
+                                           f'{str(random.randint(1, 10000))}'
+                                           f'').text)
+        if "slug" in response and "rating" in response and response['rating'] \
+                > 3.0:
             b = 'Genre is not defined.'
             try:
                 if 'genres' in response and bool(response['genres']) is True:
@@ -63,7 +71,8 @@ def random_game_rating():
             dxd = dxd + '\nGenre| ' + b
             dxd = dxd + '\nReleased| ' + str(response['released'])
             dxd = dxd + '\nRating| ' + str(response['rating'])
-            dxd = dxd + '\nAchievements| ' + str(response["achievements_count"])
+            dxd = dxd + '\nAchievements| ' + str(response
+                                                 ["achievements_count"])
             dxd = dxd + '\nWebsite| ' + response['website']
             dxd = dxd + '\nMetacritics| ' + str(response['metacritic'])
             c = html.unescape(response['description'])
@@ -77,9 +86,12 @@ def random_game_rating():
 def random_game_action():
     while True:
         # Here we take all information from the api site of a random game.
-        response = json.loads(requests.get(f'https://api.rawg.io/api/games/{str(random.randint(1, 10000))}').text)
+        response = json.loads(requests.get(f'https://api.rawg.io/api/games/'
+                                           f'{str(random.randint(1, 10000))}'
+                                           ).text)
         b = 'Genre is not defined.'
-        if "slug" in response and "genres" in response and bool(response['genres']) is True:
+        if "slug" in response and "genres" in response and \
+                bool(response['genres']) is True:
             dic_1 = (response['genres'][0])
             b = (dic_1['name'])
         if b == 'Action':
@@ -87,7 +99,8 @@ def random_game_action():
             dxd = dxd + '\nGenre| ' + b
             dxd = dxd + '\nReleased| ' + str(response['released'])
             dxd = dxd + '\nRating| ' + str(response['rating'])
-            dxd = dxd + '\nAchievements| ' + str(response["achievements_count"])
+            dxd = dxd + '\nAchievements| ' + str(response
+                                                 ["achievements_count"])
             dxd = dxd + '\nWebsite| ' + response['website']
             dxd = dxd + '\nMetacritics| ' + str(response['metacritic'])
             c = html.unescape(response['description'])
@@ -101,9 +114,12 @@ def random_game_action():
 def random_game_rpg():
     while True:
         # Here we take all information from the api site of a random game.
-        response = json.loads(requests.get(f'https://api.rawg.io/api/games/{str(random.randint(1, 10000))}').text)
+        response = json.loads(requests.get
+                              (f'https://api.rawg.io/api/games/'
+                               f'{str(random.randint(1, 10000))}').text)
         b = 'Genre is not defined.'
-        if "slug" in response and "genres" in response and bool(response['genres']) is True:
+        if "slug" in response and "genres" in response and \
+                bool(response['genres']) is True:
             dic_1 = (response['genres'][0])
             b = (dic_1['name'])
         if b == 'RPG':
@@ -111,7 +127,8 @@ def random_game_rpg():
             dxd = dxd + '\nGenre| ' + b
             dxd = dxd + '\nReleased| ' + str(response['released'])
             dxd = dxd + '\nRating| ' + str(response['rating'])
-            dxd = dxd + '\nAchievements| ' + str(response["achievements_count"])
+            dxd = dxd + '\nAchievements| ' + str(response
+                                                 ["achievements_count"])
             dxd = dxd + '\nWebsite| ' + response['website']
             dxd = dxd + '\nMetacritics| ' + str(response['metacritic'])
             c = html.unescape(response['description'])
@@ -125,9 +142,12 @@ def random_game_rpg():
 def random_game_arcade():
     while True:
         # Here we take all information from the api site of a random game.
-        response = json.loads(requests.get(f'https://api.rawg.io/api/games/{str(random.randint(1, 10000))}').text)
+        response = json.loads(requests.get
+                              (f'https://api.rawg.io/api/games/'
+                               f'{str(random.randint(1, 10000))}').text)
         b = 'Genre is not defined.'
-        if "slug" in response and "genres" in response and bool(response['genres']) is True:
+        if "slug" in response and "genres" in response and \
+                bool(response['genres']) is True:
             dic_1 = (response['genres'][0])
             b = (dic_1['name'])
         if b == 'Arcade':
@@ -135,7 +155,8 @@ def random_game_arcade():
             dxd = dxd + '\nGenre| ' + b
             dxd = dxd + '\nReleased| ' + str(response['released'])
             dxd = dxd + '\nRating| ' + str(response['rating'])
-            dxd = dxd + '\nAchievements| ' + str(response["achievements_count"])
+            dxd = dxd + '\nAchievements| ' + str(response
+                                                 ["achievements_count"])
             dxd = dxd + '\nWebsite| ' + response['website']
             dxd = dxd + '\nMetacritics| ' + str(response['metacritic'])
             c = html.unescape(response['description'])
@@ -143,3 +164,39 @@ def random_game_arcade():
             bb = re.sub(r'\<[A-Za-z\/][^>#]*\>', '', unescaped)
             dxd = dxd + '\nDescription| ' + bb
             return dxd
+
+
+def random_game_year():
+    while True:
+        # Here we take all information from the api site of a random game.
+        response = json.loads(requests.get
+                              (f'https://api.rawg.io/api/games/'
+                               f'{str(random.randint(1, 1000000))}').text)
+        if "slug" in response and "released" in response and \
+                bool(response['released']) is True:
+            a = response['released']
+            a = a.split('-')
+            x = a[0]
+            x = int(x)
+            b = 'Genre is not defined.'
+            if x >= 2019:
+                try:
+                    if 'genres' in response and \
+                            bool(response['genres']) is True:
+                        dic_1 = (response['genres'][0])
+                        b = (dic_1['name'])
+                except IndexError:
+                    pass
+                dxd = 'Name| ' + response["slug"]
+                dxd = dxd + '\nGenre| ' + b
+                dxd = dxd + '\nReleased| ' + str(response['released'])
+                dxd = dxd + '\nRating| ' + str(response['rating'])
+                dxd = dxd + '\nAchievements| ' + \
+                    str(response["achievements_count"])
+                dxd = dxd + '\nWebsite| ' + response['website']
+                dxd = dxd + '\nMetacritics| ' + str(response['metacritic'])
+                c = html.unescape(response['description'])
+                unescaped = html_decode(c)
+                bb = re.sub(r'\<[A-Za-z\/][^>#]*\>', '', unescaped)
+                dxd = dxd + '\nDescription| ' + bb
+                return dxd

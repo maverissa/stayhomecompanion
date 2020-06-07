@@ -6,61 +6,9 @@ import lyricsgenius
 import music
 import os
 import game
-
-bot = telebot.TeleBot('1116307628:AAGco0iC37MG0Yy_J3p7esHABjEpedxu7u0')
+import time
 subscribers = []
-
-
-@bot.message_handler(commands=["weekly_mailing"])
-def defining_a_subscription(message):
-    global subscribers
-    if str(message.chat.id) not in subscribers or os.stat("subscribers.txt").st_size == 0:
-        markup = types.InlineKeyboardMarkup()
-        markup.add(telebot.types.InlineKeyboardButton(text='Yes',
-                                                          callback_data='Yes'))
-        markup.add(telebot.types.InlineKeyboardButton(text='No',
-                                                          callback_data='No'))
-        bot.send_message(message.chat.id,
-                             'Do you want to subscribe to our weekly mailing?',
-                             reply_markup=markup)
-    if str(message.chat.id) in subscribers:
-        markup = types.InlineKeyboardMarkup()
-        markup.add(telebot.types.InlineKeyboardButton(text='Yes',
-                                                      callback_data='yes'))
-        markup.add(telebot.types.InlineKeyboardButton(text='No',
-                                                      callback_data='no'))
-        bot.send_message(message.chat.id,
-                         'You are already subscribed to the mailing. Do you wa'
-                         'nt to stop receiving it?', reply_markup=markup)
-
-
-@bot.callback_query_handler(func=lambda call: True)
-def subscribe(call):
-    if call.data == 'Yes':
-        subscribers.append(str(call.from_user.id))
-        with open('subscribers.txt', 'w', encoding='utf-8') as s:
-            for i in subscribers:
-                s.write(str(i) + '\n')
-        bot.send_message(call.message.chat.id,
-                         'From this moment every week you will receive '
-                         'fascinating games, films and music fresh compilation'
-                         's from us!')
-    elif call.data == 'No':
-        bot.send_message(call.message.chat.id,
-                         'OK. But keep in mind that you can miss really cool '
-                         'compilations from us.')
-    elif call.data == 'yes':
-        subscribers.remove(str(call.from_user.id))
-        print(subscribers)
-        with open('subscribers.txt', 'w', encoding='utf-8') as s:
-            for i in subscribers:
-                s.write(str(i) + '\n')
-        bot.send_message(call.message.chat.id,
-                         'From this moment you will not get our fascinatin'
-                         'g games, films and music fresh '
-                         'compilations every week')
-    elif call.data == 'no':
-        bot.send_message(call.message.chat.id, "OK. Hope you enjoy it!")
+bot = telebot.TeleBot('1116307628:AAGco0iC37MG0Yy_J3p7esHABjEpedxu7u0')
 
 
 def buttons(call, which_buttons, which_msg):
@@ -71,6 +19,14 @@ def buttons(call, which_buttons, which_msg):
         markup.add(telebot.types.InlineKeyboardButton
                    (text=which_buttons[i], callback_data=which_buttons[i]))
     bot.send_message(call.message.chat.id, which_msg, reply_markup=markup)
+
+
+def updating_subscribers():
+    with open('subscribers.txt', 'r', encoding='utf-8') as s:
+        for line in s:
+            line = line.split('\n')
+            if line[0] not in subscribers:
+                subscribers.append(line[0])
 
 
 @bot.message_handler(commands=["start"])
@@ -89,22 +45,45 @@ def greetings(message):
                                       'series or music for you.')
 
 
-@bot.message_handler(commands=["recommendations"])
-def general_menu(message):
-    markup = types.InlineKeyboardMarkup()
-    markup.add(telebot.types.InlineKeyboardButton
-               (text=(emoji.emojize('Games :video_game:', use_aliases=True)),
-                callback_data='games'))
-    markup.add(
-        telebot.types.InlineKeyboardButton
-        (text=(emoji.emojize('Music :headphones:', use_aliases=True)),
-         callback_data='mus'))
-    markup.add(
-        telebot.types.InlineKeyboardButton
-        (text=(emoji.emojize('Сinematograph :movie_camera:',
-                             use_aliases=True)), callback_data='films'))
-    bot.send_message(message.chat.id, 'What do you want me to recommend you?',
-                     reply_markup=markup)
+@bot.message_handler(commands=["weekly_mailing"])
+def defining_a_subscription(message):
+    global subscribers
+    updating_subscribers()
+    if str(message.chat.id) not in subscribers or \
+            os.stat("subscribers.txt").st_size == 0:
+        markup = types.InlineKeyboardMarkup()
+        markup.add(telebot.types.InlineKeyboardButton(text='Yes',
+                                                      callback_data='Yes'))
+        markup.add(telebot.types.InlineKeyboardButton(text='No',
+                                                      callback_data='No'))
+        bot.send_message(message.chat.id,
+                         'Do you want to subscribe to our weekly mailing?',
+                         reply_markup=markup)
+    if str(message.chat.id) in subscribers:
+        markup = types.InlineKeyboardMarkup()
+        markup.add(telebot.types.InlineKeyboardButton(text='Yes',
+                                                      callback_data='yes'))
+        markup.add(telebot.types.InlineKeyboardButton(text='No',
+                                                      callback_data='no'))
+        bot.send_message(message.chat.id,
+                         'You are already subscribed to the mailing. Do you wa'
+                         'nt to stop receiving it?', reply_markup=markup)
+
+
+@bot.message_handler(commands=["NTcddme4C5"])
+def mailing(message):
+    subscribers_li = []
+    with open('subscribers.txt', 'r', encoding='utf-8') as s:
+        for line in s:
+            subscribers_li.append(line)
+        for i in subscribers_li:
+            bot.send_message(i, "Enjoy our weekly compilation!\nLatest music:")
+            music.searching_a_song('https://api.deezer.com/playlist/7131475044'
+                                   '', 74, 3, i)
+            bot.send_message(i, 'Here is a hot new game:\n' +
+                             game.random_game_year())
+            bot.send_message(i, 'Here is one of the best movies of 19-20s:\n')
+            film.film_subscription(i)
 
 
 @bot.message_handler(commands=["lyrics"])
@@ -128,46 +107,49 @@ def song_lyrics(message):
             "Sorry, I didn't find such a song :cry:", use_aliases=True))
 
 
+@bot.message_handler(commands=["recommendations"])
+def general_menu(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(telebot.types.InlineKeyboardButton
+               (text=(emoji.emojize('Games :video_game:', use_aliases=True)),
+                callback_data='games'))
+    markup.add(
+        telebot.types.InlineKeyboardButton
+        (text=(emoji.emojize('Music :headphones:', use_aliases=True)),
+         callback_data='mus'))
+    markup.add(
+        telebot.types.InlineKeyboardButton
+        (text=(emoji.emojize('Сinematograph :movie_camera:',
+                             use_aliases=True)), callback_data='films'))
+    bot.send_message(message.chat.id, 'What do you want me to recommend you?',
+                     reply_markup=markup)
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def query_handler(call):
-    if call.data == 'games':
-        markup = types.InlineKeyboardMarkup()
-        markup.add(telebot.types.InlineKeyboardButton(text='Games with rating >3.0',
-                                                      callback_data='rating'))
-        markup.add(telebot.types.InlineKeyboardButton(text='Random game',
-                                                      callback_data='randg'))
-        markup.add(telebot.types.InlineKeyboardButton(text='Action game',
-                                                      callback_data='Action'))
-        markup.add(telebot.types.InlineKeyboardButton(text='RPG game',
-                                                      callback_data='RPG'))
-        markup.add(telebot.types.InlineKeyboardButton(text='Arcade game',
-                                                      callback_data='Arcade'))
-        bot.send_message(call.message.chat.id, "Choose one:", reply_markup=markup)
-
-    if call.data == 'randg':
+    if call.data == 'games':  # work with games API
+        buttons(call, game.buttons, game.msg)
+    if call.data == game.buttons[0]:
         bot.send_message(call.message.chat.id, 'Here is a random game! ')
         bot.send_message(call.message.chat.id, game.random_game())
 
-    elif call.data == 'rating':
-        bot.send_message(call.message.chat.id, 'Here is a random game with high rating! ')
+    elif call.data == game.buttons[1]:
+        bot.send_message(call.message.chat.id, 'Here is a random game with '
+                                               'high rating! ')
         bot.send_message(call.message.chat.id, game.random_game_rating())
 
-    elif call.data == 'Action':
-        bot.send_message(call.message.chat.id, 'Here is a random action game! ')
+    elif call.data == game.buttons[2]:
+        bot.send_message(call.message.chat.id, 'Here is a random action game!')
         bot.send_message(call.message.chat.id, game.random_game_action())
 
-    elif call.data == 'RPG':
+    elif call.data == game.buttons[3]:
         bot.send_message(call.message.chat.id, 'Here is a random rpg game! ')
         bot.send_message(call.message.chat.id, game.random_game_rpg())
 
-    elif call.data == 'Arcade':
-        bot.send_message(call.message.chat.id, 'Here is a random arcade game! ')
+    elif call.data == game.buttons[4]:
+        bot.send_message(call.message.chat.id, 'Here is a random arcade game!')
         bot.send_message(call.message.chat.id, game.random_game_arcade())
-
-        # work with games API
-        pass
-    elif call.data == 'mus':
-        # work with music API
+    elif call.data == 'mus':  # work with music API
         buttons(call, music.mus_menu, music.mus_menu_msg)
     if call.data == music.mus_menu[0]:  # hit parades
         buttons(call, music.ht_button, music.ht_msg)
@@ -184,8 +166,7 @@ def query_handler(call):
     elif call.data in music.mood_button:
         music.mood_song(call)
         buttons(call, music.mood_button, music.mood_msg)
-    elif call.data == 'films':
-        # work with the movie API
+    elif call.data == 'films':  # work with the movie API
         buttons(call, film.film_menu, film.film_menu_msg)
     if call.data == film.film_menu[0]:  # top5
         bot.send_message(call.message.chat.id, 'Here are 5 movies from top '
@@ -214,6 +195,31 @@ def query_handler(call):
     elif call.data in film.year_button:
         film.by_year(call)
         buttons(call, film.year_button, film.year_msg)
+    if call.data == 'Yes':  # subscription
+        updating_subscribers()
+        subscribers.append(str(call.from_user.id))
+        with open('subscribers.txt', 'w', encoding='utf-8') as s:
+            for i in subscribers:
+                s.write(str(i) + '\n')
+        bot.send_message(call.message.chat.id,
+                         'From this moment every week you will receive '
+                         'fascinating games, films and music fresh compilation'
+                         's from us!')
+    elif call.data == 'No':
+        bot.send_message(call.message.chat.id,
+                         'OK. But keep in mind that you can miss really cool '
+                         'compilations from us.')
+    elif call.data == 'yes':
+        subscribers.remove(str(call.from_user.id))
+        with open('subscribers.txt', 'w', encoding='utf-8') as s:
+            for i in subscribers:
+                s.write(str(i) + '\n')
+        bot.send_message(call.message.chat.id,
+                         'From this moment you will not get our fascinatin'
+                         'g games, films and music fresh '
+                         'compilations every week')
+    elif call.data == 'no':
+        bot.send_message(call.message.chat.id, "OK. Hope you enjoy it!")
 
 
 bot.polling()
